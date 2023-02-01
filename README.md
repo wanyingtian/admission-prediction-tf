@@ -8,7 +8,7 @@ By analyzing the parameters in this graduate admissions dataset, you will use Te
 
 I hope this will give you further insight into the graduate admissions world and improve my test prep strategy.
 ## About Dataset
-Dataset Source [Graduate Admission] (https://www.kaggle.com/datasets/mohansacharya/graduate-admissions?select=Admission_Predict_Ver1.1.csv)
+Dataset Source [Graduate Admission](https://www.kaggle.com/datasets/mohansacharya/graduate-admissions?select=Admission_Predict_Ver1.1.csv)
 
 #### Content
 The dataset contains several parameters which are considered important during the application for Masters Programs.

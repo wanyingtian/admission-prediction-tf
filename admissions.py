@@ -45,37 +45,45 @@ def build_model(features):
     input = InputLayer(input_shape = (features.shape[1],))
     # add input layer to my model
     my_model.add(input)
-    # add hidden layer with relu activation function, 64 hidden units
-    # WHY 64
-    my_model.add(Dense(64, activation = 'relu'))
+    # add hidden layer 1 with relu activation function, 64 hidden units
+    HL1 =layers.Dense(16, activation = 'relu')
+    # add hidden layer 2 with relu activation function, 8 hidden units
+    HL2 =layers.Dense(8, activation = 'relu')
+    my_model.add(HL1)
+    my_model.add(layers.Dropout(0.1))
+    my_model.add(HL2)
+    my_model.add(layers.Dropout(0.2))
     # add output layer - single output regression, 1 neuron
     my_model.add(Dense(1))
     # print model summary
     print(my_model.summary())
     # Create an instance of the Adam optimizer with the learning rate equal to 0.01.
-    opt = Adam(learning_rate = 0.01)
+    opt = Adam(learning_rate = 0.001)
     # Compile: loss use the Mean Squared Error (mse);  metrics use the Mean Absolute Error (mae)
     my_model.compile(loss = 'mse', metrics = ['mae'], optimizer = opt)
     return my_model
 ## apply the model
 model = build_model(features_train_normalized)
-
+# apply early stopping for efficiency
+es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=20)
 ## Fit and Evaluate the model
 print("Fitting the model...")
-history = model.fit(features_train_normalized, labels_train.to_numpy(), epochs=20, batch_size = 1, verbose = 1, validation_split=0.2)
+history = model.fit(features_train_normalized, labels_train.to_numpy(), epochs=100, batch_size = 8, verbose = 1, validation_split=0.2, callbacks=[es])
 
 print("Evaluating the model...")
 val_mse, val_mae = model.evaluate(features_test_normalized, labels_test.to_numpy(), verbose = 0)
-print("Final loss is:" + str(val_mse) + ", final metric is:" + str(val_mae))
+print("Final loss is:" + str(val_mse) + ", final mae is:" + str(val_mae))
 
 
 # evauate r-squared score
 y_pred = model.predict(features_test_normalized)
+# compute r2 scores based on prediction performance
+print("R^2 score: "+ str(r2_score(labels_test,y_pred)))
 
-print(r2_score(labels_test,y_pred))
 
-# plot MAE and val_MAE over each epoch
 fig = plt.figure()
+# plot MAE and val_MAE over each epoch
+
 ax1 = fig.add_subplot(2, 1, 1)
 ax1.plot(history.history['mae'])
 ax1.plot(history.history['val_mae'])
@@ -83,6 +91,8 @@ ax1.set_title('model mae')
 ax1.set_ylabel('MAE')
 ax1.set_xlabel('epoch')
 ax1.legend(['train', 'validation'], loc='upper left')
+
+
 
 # Plot loss and val_loss over each epoch
 ax2 = fig.add_subplot(2, 1, 2)
@@ -92,6 +102,9 @@ ax2.set_title('model loss')
 ax2.set_ylabel('loss')
 ax2.set_xlabel('epoch')
 ax2.legend(['train', 'validation'], loc='upper left')
+
+
+
 
 plt.show()
 print('done')
